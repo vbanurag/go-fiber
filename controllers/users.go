@@ -8,6 +8,8 @@ import (
 	"github.com/vbanurag/go-fiber/helper"
 	"github.com/vbanurag/go-fiber/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func GetAllUsers(c *fiber.Ctx) {
@@ -75,4 +77,84 @@ func AddUser(c *fiber.Ctx) {
 	}
 
 	c.JSON(result)
+}
+
+func GetUser(c *fiber.Ctx) {
+
+	var user models.User
+
+	// string to primitive.ObjectID
+	id, _ := primitive.ObjectIDFromHex(c.Params("id"))
+
+	collection := helper.ConnectDB("users")
+
+	// We create filter. If it is unnecessary to sort data for you, you can use bson.M{}
+	filter := bson.M{"_id": id}
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
+
+	if err != nil {
+		log.Println(err)
+		c.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"message": err,
+		})
+		return
+	}
+
+	c.JSON(user)
+}
+
+func EditUser(c *fiber.Ctx) {
+
+	//Get id from parameters
+	id, _ := primitive.ObjectIDFromHex(c.Params("id"))
+
+	var user models.User
+
+	p := new(models.User)
+
+	collection := helper.ConnectDB("users")
+
+	// Create filter
+	filter := bson.M{"_id": id}
+
+	// Read update model from body request
+	if err := c.BodyParser(p); err != nil {
+		log.Println(err)
+		c.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"message": err,
+		})
+		return
+	}
+
+	// prepare update model.
+	update := bson.M{
+		"$set": bson.M{
+			"name": bson.M{
+				"firstname": p.Name.FirstName,
+				"lastname":  p.Name.LastName,
+			},
+		},
+	}
+	upsert := true
+	after := options.After
+
+	opt := options.FindOneAndUpdateOptions{
+		ReturnDocument: &after,
+		Upsert:         &upsert,
+	}
+
+	err := collection.FindOneAndUpdate(context.TODO(), filter, update, &opt).Decode(&user)
+
+	if err != nil {
+		log.Println(err)
+		c.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"message": err,
+		})
+		return
+	}
+
+	c.JSON(user)
 }

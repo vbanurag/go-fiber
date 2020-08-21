@@ -9,8 +9,8 @@ func users(api fiber.Router) {
 	users := api.Group("/users")
 
 	users.Get("/", controllers.GetAllUsers)
-	// users.Get("/:id", Controller.GetUser)
+	users.Get("/:id", controllers.GetUser)
 	users.Post("/", controllers.AddUser)
-	// users.Put("/:id", Controller.EditUser)
+	users.Put("/:id", controllers.EditUser)
 	// users.Delete("/:id", Controller.DeleteUser)
 }
