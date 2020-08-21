@@ -49,3 +49,30 @@ func GetAllUsers(c *fiber.Ctx) {
 
 	c.JSON(users)
 }
+
+func AddUser(c *fiber.Ctx) {
+
+	p := new(models.User)
+	// we decode our body request params
+	if err := c.BodyParser(p); err != nil {
+		log.Println(err)
+		c.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"message": err,
+		})
+		return
+	}
+
+	// connect db
+	collection := helper.ConnectDB("users")
+
+	// insert our user model.
+	result, err := collection.InsertOne(context.TODO(), p)
+
+	if err != nil {
+		log.Fatal(err)
+		return
+	}
+
+	c.JSON(result)
+}

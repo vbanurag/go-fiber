@@ -10,7 +10,7 @@ func users(api fiber.Router) {
 
 	users.Get("/", controllers.GetAllUsers)
 	// users.Get("/:id", Controller.GetUser)
-	// users.Post("/", Controller.AddUser)
+	users.Post("/", controllers.AddUser)
 	// users.Put("/:id", Controller.EditUser)
 	// users.Delete("/:id", Controller.DeleteUser)
 }
