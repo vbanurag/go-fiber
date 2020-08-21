@@ -12,5 +12,5 @@ func users(api fiber.Router) {
 	users.Get("/:id", controllers.GetUser)
 	users.Post("/", controllers.AddUser)
 	users.Put("/:id", controllers.EditUser)
-	// users.Delete("/:id", Controller.DeleteUser)
+	users.Delete("/:id", controllers.DeleteUser)
 }

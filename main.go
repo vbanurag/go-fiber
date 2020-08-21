@@ -4,11 +4,16 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber"
+	"github.com/vbanurag/go-fiber/configuration"
 	"github.com/vbanurag/go-fiber/routes"
 )
 
 func main() {
 	app := fiber.New()
+	config, err := configuration.GetConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	api := app.Group("/api")
 
@@ -21,10 +26,10 @@ func main() {
 		}
 	})
 
-	err := app.Listen(3000)
+	_err := app.Listen(config.Port)
 
-	if err != nil {
+	if _err != nil {
 		// Exit the application
-		log.Fatal(err)
+		log.Fatal(_err)
 	}
 }

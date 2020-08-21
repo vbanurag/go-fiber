@@ -158,3 +158,27 @@ func EditUser(c *fiber.Ctx) {
 
 	c.JSON(user)
 }
+
+func DeleteUser(c *fiber.Ctx) {
+
+	// string to primitve.ObjectID
+	id, err := primitive.ObjectIDFromHex(c.Params("id"))
+
+	collection := helper.ConnectDB("users")
+
+	// prepare filter.
+	filter := bson.M{"_id": id}
+
+	deleteResult, err := collection.DeleteOne(context.TODO(), filter)
+
+	if err != nil {
+		log.Println(err)
+		c.Status(400).JSON(&fiber.Map{
+			"success": false,
+			"message": err,
+		})
+		return
+	}
+
+	c.JSON(deleteResult)
+}
